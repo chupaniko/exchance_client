@@ -9,11 +9,11 @@ const Header = () => (
     <header className="App-header">
         <Link to='/'>
           <span className="clickable">
-            <img className="logo App-logo" src="/img/exchance_logo.png" alt="Exchance Logo" />
+            <img className="logo App-logo" src="/img/exchance_logo.png" alt="Exchance Logo"/>
             <span>Exchance</span>
           </span>
         </Link>
-        <div className="spacer"></div>
+        <div className="spacer"/>
         <FormControl>
             <InputLabel htmlFor="top-search">Поиск</InputLabel>
             <Input
@@ -21,15 +21,19 @@ const Header = () => (
                 type='text'
                 endAdornment={
                     <InputAdornment position="end">
-                        <SearchIcon />
+                        <SearchIcon/>
                     </InputAdornment>
                 }
             />
         </FormControl>
-        <div className="spacer"></div>
-        <Link to='/auth'>
-            <ExitToAppIcon className="clickable logout" routerLink="auth">login</ExitToAppIcon>
-        </Link>
+        <div className="spacer"/>
+        {sessionStorage.getItem("userId") !== "" && sessionStorage.getItem("userId") !== null ?
+            <Link to="/auth"><span className="clickable logout" routerlink="auth">
+                {sessionStorage.getItem("firstName")} {sessionStorage.getItem("lastName")}
+            </span></Link> :
+            <Link to='/auth'>
+                <ExitToAppIcon className="clickable logout" routerlink="auth">login</ExitToAppIcon>
+            </Link>}
     </header>
 );
 
