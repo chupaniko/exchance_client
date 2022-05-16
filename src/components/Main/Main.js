@@ -6,83 +6,135 @@ import axios from "axios";
 
 const Main = () => {
     const [values, setValues] = React.useState({
-        vacancyName: "",
-        vacancyDescription: "",
-        vacancySalary: ""
+        projectName: "",
+        projectDescription: "",
+        projectField: "",
+        postId: ""
     });
 
     const handleChange = (prop) => (event) => {
         setValues({...values, [prop]: event.target.value});
     };
 
+    const headers = {
+        'Content-Type': 'application/json;charset=utf-8',
+        'Access-Control-Allow-Origin': '*'
+    };
+
+    function publishProject(json) {
+        //работает без return
+        /*axios.post('http://localhost:8080/api/v1/projectconstructor/publishproject', json, {headers})
+            .then(response => {
+                console.log("внутри");
+                setValues({
+                    ...values,
+                    postId: response.data.id
+                });
+                console.log(response.data);
+            });*/
+        return axios.post('http://localhost:8080/api/v1/projectconstructor/publishproject', json, {headers});
+    }
+
+    function getLastProject(json) {
+        return axios.post('http://localhost:8080/api/v1/projectconstructor/getLastProject', json, {headers});
+            /*.then(response => {
+                console.log(response.data);
+            });*/
+    }
+
     function handleSubmit(e) {
         e.preventDefault();
         e.stopPropagation();
         let json = null;
-        if (values.salary !== '' && values.vacancyName !== '' && values.vacancyDescription !== '') {
+        if (values.projectName !== '' && values.projectDescription !== '' && values.projectField !== '') {
             json = JSON.stringify({
-                vacancyName: values.vacancyName,
-                vacancyDescription: values.vacancyDescription,
-                vacancySalary: values.vacancySalary
+                token: sessionStorage.getItem("userToken"),
+                projectName: values.projectName,
+                projectDescription: values.projectDescription,
+                projectField: values.projectField
             });
-            axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
+            console.log(values.projectName, values.projectDescription, values.projectField);
+            Promise.all([publishProject(json), getLastProject(json)]).then(r => {
+                console.log(r[0].data);
+                console.log(r[1].data);
+            });
+            //publishProject(json);
+            //getLastProject(json);
+            /*axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
             axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-            axios.post('http://localhost:8080/api/v1/registration', json)
+            //axios.defaults.headers.post['Access-Control-Allow-Origin-Methods'] = 'GET,PUT,POST,DELETE,PATCH,OPTIONS';
+            axios.post('http://localhost:8080/api/v1/projectconstructor/publishproject', json)
                 .then(response => {
+                    console.log("внутри");
                     setValues({
                         ...values,
-                        postId: response.data.id,
-                        confirmationToken: response.data
+                        postId: response.data.id
                     });
-                    sessionStorage.setItem("confirmationToken", response.data);
+                    console.log(response.data);
+                });*/
+            /*axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
+            axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';*/
+            /*axios.get('http://localhost:8080/api/v1/projectconstructor/getLastProject').then(response => {
+                console.log("внутри");
+                setValues({
+                    ...values,
+                    postId: response.data.id
                 });
+                console.log(response.data);
+            });*/
         }
     }
+
 
     return (
         <form onSubmit={handleSubmit}>
             <div>
                 <div>
+                    {sessionStorage.getItem("userToken") !== "" && sessionStorage.getItem("userToken") !== null ?
+                        <p>Привет! Ваш токен: {sessionStorage.getItem("userToken")}</p> :
+                        <p> Привет! У Вас нет токена</p>}
+                </div>
+                <div>
                     <FormControl>
-                        <InputLabel htmlFor="vacancyName">Название вакансии</InputLabel>
+                        <InputLabel htmlFor="projectName">Название проекта</InputLabel>
                         <Input
-                            id="vacancyName"
-                            value={values.vacancyName}
-                            onChange={handleChange('vacancyName')}/>
+                            id="projectName"
+                            value={values.projectName}
+                            onChange={handleChange('projectName')}/>
                     </FormControl>
                 </div>
                 <div>
                     <FormControl>
-                        <InputLabel htmlFor="vacancyDescription">Описание вакансии</InputLabel>
+                        <InputLabel htmlFor="projectDescription">Описание проекта</InputLabel>
                         <Input
-                            id="vacancyDescription"
-                            value={values.vacancyDescription}
-                            onChange={handleChange('vacancyDescription')}/>
+                            id="projectDescription"
+                            value={values.projectDescription}
+                            onChange={handleChange('projectDescription')}/>
                     </FormControl>
                 </div>
                 <div>
                     <FormControl>
-                        <InputLabel htmlFor="vacancySalary">Зарплата</InputLabel>
+                        <InputLabel htmlFor="projectField">Сфера</InputLabel>
                         <Input
-                            id="vacancySalary"
-                            value={values.salary}
-                            onChange={handleChange('vacancySalary')}/>
+                            id="projectField"
+                            value={values.projectField}
+                            onChange={handleChange('projectField')}/>
                     </FormControl>
                 </div>
-                <div className='createVacancy'>
-                    <Button id="createVacancy" variant="outlined" type="submit">Создать вакансию</Button>
+                <div className='createProject'>
+                    <Button id="createProject" variant="outlined" type="submit">Создать проект</Button>
                 </div>
                 <div>
-                    <Card sx={{ minWidth: 275 }}>
+                    <Card sx={{minWidth: 275}}>
                         <CardContent>
-                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                20$
+                            <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom id="field">
+                                Производство товаров и услуг
                             </Typography>
-                            <Typography variant="h5" component="div">
-                                1С-программист
+                            <Typography variant="h5" component="div" id="name">
+                                Организация персональных турситических туров
                             </Typography>
-                            <Typography variant="body2">
-                                описание вакансии
+                            <Typography variant="body2" id="description">
+                                Персональные туры
                             </Typography>
                         </CardContent>
                         <CardActions>

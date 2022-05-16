@@ -6,6 +6,20 @@ import {useNavigate} from "react-router-dom";
 import {render} from "react-dom";
 import Main from "../Main/Main";
 
+/*const user = {
+    name: 'Jackator',
+    roles: ['user', 'admin'],
+    rights: ['can_view_articles']
+};
+
+export const isAuthenticated = user => !!user;
+
+export const isAllowed = (user, rights) =>
+    rights.some(right => user.rights.includes(right));
+
+export const hasRole = (user, roles) =>
+    roles.some(role => user.roles.includes(role));*/
+
 const Auth = () => {
     const [values, setValues] = React.useState({
         password: "",
@@ -15,11 +29,12 @@ const Auth = () => {
         showReg: false,
         postId: null,
         confirmationToken: "token",
-        userId: "",
+        userToken: "",
         firstName: "",
         lastName: ""
     });
 
+    //как использовать?
     let navigate = useNavigate();
     //let history = useHistory();
 
@@ -39,12 +54,14 @@ const Auth = () => {
         setValues({...values, [prop]: event.target.value});
     };
 
+    //отправка формы
     function handleSubmit(e) {
         e.preventDefault();
         e.stopPropagation();
         console.log(values.showReg);
         let json = null;
         if (values.email !== '' && values.password !== '') {
+            //регистрация
             if (values.showReg && values.password === values.confirmedPassword) {
                 json = JSON.stringify({
                     firstName: values.firstName,
@@ -70,6 +87,7 @@ const Auth = () => {
                         });
                         sessionStorage.setItem("confirmationToken", response.data);
                     });
+                //вход
             } else if (!values.showReg) {
                 json = JSON.stringify({
                     email: values.email,
@@ -86,22 +104,23 @@ const Auth = () => {
                         setValues({
                             ...values,
                             postId: response.data.id,
-                            userId: data[0],
+                            userToken: data[0],
                             firstName: data[1],
                             lastName: data[2]
                         });
-                        sessionStorage.setItem("userId", data[0]);
+                        sessionStorage.setItem("userToken", data[0]);
                         sessionStorage.setItem("firstName", data[1]);
                         sessionStorage.setItem("lastName", data[2]);
                     });
-                //return <Redirect to='/' />
-                //history.push('/');
+                /*return <Redirect to='/' />
+                history.push('/');*/
+                //УТЕЧКА ПАМЯТИ
                 navigate("/", {replace: true});
                 window.location.reload();
             }
         }
-        console.log(values.userId);
-        console.log(sessionStorage.getItem("userId"));
+        console.log(values.userToken);
+        console.log(sessionStorage.getItem("userToken"));
     }
 
     const fieldsForAuth = () => {
@@ -133,84 +152,85 @@ const Auth = () => {
         && sessionStorage.getItem("userId") !== null) {
         return <Redirect to='/'/>
     } else
-        */return (
-            <form onSubmit={handleSubmit}>
-                {values.showReg ? fieldsForAuth() : null}
-                <div>
-                    <FormControl>
-                        <InputLabel htmlFor="email">E-mail</InputLabel>
-                        <Input
-                            id="email"
-                            value={values.email}
-                            onChange={handleChange('email')}/>
-                    </FormControl>
-                </div>
-                <div>
-                    <FormControl>
-                        <InputLabel htmlFor="password">Пароль</InputLabel>
-                        <Input
-                            id="password"
-                            type={values.showPassword ? 'text' : 'password'}
-                            value={values.password}
-                            onChange={handleChange('password')}
-                            endAdornment={
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
-                                    >
-                                        {values.showPassword ? <Visibility/> : <VisibilityOff/>}
-                                    </IconButton>
-                                </InputAdornment>
-                            }
-                        />
-                    </FormControl>
-                </div>
-                {!values.showReg ?
-                    <div id="forAuth">
-                        <div className='forAuth'>
-                            <Button id="login" variant="outlined" type="submit">Войти</Button>
-                        </div>
-                        <div className='forAuth'>
-                            <a id="toRegister"
-                               onClick={handleClickShowHideReg}>Зарегистрироваться</a>
-                        </div>
-                    </div> :
-                    <div id="forReg">
-                        <div className='forReg'>
-                            <FormControl>
-                                <InputLabel htmlFor="confirmedPassword">Повторите пароль</InputLabel>
-                                <Input
-                                    id="confirmedPassword"
-                                    type={values.showPassword ? 'text' : 'password'}
-                                    value={values.confirmedPassword}
-                                    onChange={handleChange('confirmedPassword')}
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label="toggle password visibility"
-                                                onClick={handleClickShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                            >
-                                                {values.showPassword ? <Visibility/> : <VisibilityOff/>}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                />
-                            </FormControl>
-                        </div>
-                        <div className='forReg'>
-                            <Button id="register" variant="outlined" type="submit">Зарегистрироваться</Button>
-                        </div>
-                        <div className='forReg'>
-                            <a id="toAuth"
-                               onClick={handleClickShowHideReg}>Войти</a>
-                        </div>
+        */
+    return (
+        <form onSubmit={handleSubmit}>
+            {values.showReg ? fieldsForAuth() : null}
+            <div>
+                <FormControl>
+                    <InputLabel htmlFor="email">E-mail</InputLabel>
+                    <Input
+                        id="email"
+                        value={values.email}
+                        onChange={handleChange('email')}/>
+                </FormControl>
+            </div>
+            <div>
+                <FormControl>
+                    <InputLabel htmlFor="password">Пароль</InputLabel>
+                    <Input
+                        id="password"
+                        type={values.showPassword ? 'text' : 'password'}
+                        value={values.password}
+                        onChange={handleChange('password')}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowPassword}
+                                    onMouseDown={handleMouseDownPassword}
+                                >
+                                    {values.showPassword ? <Visibility/> : <VisibilityOff/>}
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    />
+                </FormControl>
+            </div>
+            {!values.showReg ?
+                <div id="forAuth">
+                    <div className='forAuth'>
+                        <Button id="login" variant="outlined" type="submit">Войти</Button>
                     </div>
-                }
-            </form>
-        );
+                    <div className='forAuth'>
+                        <a id="toRegister"
+                           onClick={handleClickShowHideReg}>Зарегистрироваться</a>
+                    </div>
+                </div> :
+                <div id="forReg">
+                    <div className='forReg'>
+                        <FormControl>
+                            <InputLabel htmlFor="confirmedPassword">Повторите пароль</InputLabel>
+                            <Input
+                                id="confirmedPassword"
+                                type={values.showPassword ? 'text' : 'password'}
+                                value={values.confirmedPassword}
+                                onChange={handleChange('confirmedPassword')}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={handleMouseDownPassword}
+                                        >
+                                            {values.showPassword ? <Visibility/> : <VisibilityOff/>}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                            />
+                        </FormControl>
+                    </div>
+                    <div className='forReg'>
+                        <Button id="register" variant="outlined" type="submit">Зарегистрироваться</Button>
+                    </div>
+                    <div className='forReg'>
+                        <a id="toAuth"
+                           onClick={handleClickShowHideReg}>Войти</a>
+                    </div>
+                </div>
+            }
+        </form>
+    );
 };
 
 export default Auth;

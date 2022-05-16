@@ -27,7 +27,7 @@ const Header = () => (
             />
         </FormControl>
         <div className="spacer"/>
-        {sessionStorage.getItem("userId") !== "" && sessionStorage.getItem("userId") !== null ?
+        {sessionStorage.getItem("userToken") !== "" && sessionStorage.getItem("userToken") !== null ?
             <Link to="/auth"><span className="clickable logout" routerlink="auth">
                 {sessionStorage.getItem("firstName")} {sessionStorage.getItem("lastName")}
             </span></Link> :
